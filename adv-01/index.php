@@ -44,7 +44,7 @@
   <body>
     <smart-player
       style="display: block; margin: 0 auto; width: 100%"
-    ></smart-player> 
+    ></smart-player>
     <script>
       (function () {
         var s = document.createElement("script");
