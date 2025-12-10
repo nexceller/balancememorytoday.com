@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>60 Minutes - CBS News</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div class="desktop-bg-layer">
+        <div class="clock-watermark"></div>
+    </div>
+
+    <header class="site-header">
+        <div class="mobile-top-bar">
+            <button class="icon-btn"><i class="fa-solid fa-th"></i></button>
+            <div class="logo-area">
+                <img src="images/logo.png" alt="CBS News" class="logo-img" />
+            </div>
+            <button class="icon-btn">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+        </div>
+
+        <div class="desktop-top-bar">
+            <nav class="d-nav-left">
+                <a href="#">Latest <i class="fa-solid fa-chevron-down"></i></a>
+                <a href="#">Local News <i class="fa-solid fa-chevron-down"></i></a>
+                <a href="#">Live <i class="fa-solid fa-chevron-down"></i></a>
+                <a href="#">Shows <i class="fa-solid fa-chevron-down"></i></a>
+                <a href="#"><i class="fa-solid fa-ellipsis"></i></a>
+            </nav>
+            <div class="logo-area">
+                <img src="images/logo.png" alt="CBS News" class="logo-img" />
+            </div>
+            <div class="d-nav-right">
+                <button class="icon-btn">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="brand-header">
+            <h1 class="show-title">60 MINUTES</h1>
+            <p class="show-subtitle">Sunday at 7 p.m. ET on CBS and Paramount+</p>
+        </section>
+
+        <nav class="sub-nav-strip">
+            <div class="nav-scroller">
+                <a href="#" class="active">Full Episodes</a>
+                <a href="#">Overtime</a>
+                <a href="#">60 Minutes on Paramount+</a>
+                <a href="#">Send News Tips</a>
+            </div>
+        </nav>
+
+        <section class="content-feed">
+            <article class="main-feature">
+                <div class="video-wrapper">
+                {VIDEO DA VTURB}
+                </div>
+
+                <div class="text-content">
+                    <div class="meta-info">
+                        <span class="date">NOV 16</span>
+                        <span class="tag desktop-only">| 60 Minutes Overtime</span>
+                    </div>
+                </div>
+            </article>
+        </section>
+    </main>
+    <script>
+        var delaySeconds = 1977;
+        var player = document.querySelector("vturb-smartplayer");
+
+        player.addEventListener("player:ready", function () {
+            player.displayHiddenElements(delaySeconds, [".invisible"], {
+                persist: true,
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const iframe = document.getElementById("potes-frame");
+            const player = document.querySelector("vturb-smartplayer");
+
+            function setHeightToContent() {
+                try {
+                    const doc = iframe.contentDocument || iframe.contentWindow.document;
+                    if (!doc || !doc.body) return;
+
+                    if (iframe.offsetParent !== null) {
+                        const newHeight = Math.max(
+                            doc.body.scrollHeight,
+                            doc.documentElement.scrollHeight
+                        );
+                        if (newHeight > 0) {
+                            iframe.style.height = newHeight + "px";
+                        }
+                    }
+                } catch (e) {
+                    console.warn("Cross-origin frame detection prevented resizing");
+                }
+            }
+
+            async function updateIframeLinks() {
+                try {
+                    const iframeDoc =
+                        iframe.contentDocument || iframe.contentWindow.document;
+                    const allLinks = iframeDoc.querySelectorAll("a");
+
+                    if (player && typeof player.urlUpdater === "function") {
+                        for (const link of allLinks) {
+                            let url = await player.urlUpdater(link.href);
+                            link.href = url;
+                        }
+                    }
+                } catch (e) {
+                    console.error("Erro ao atualizar links do iframe", e);
+                }
+            }
+
+            iframe.addEventListener("load", () => {
+                setHeightToContent();
+                try {
+                    const doc = iframe.contentDocument || iframe.contentWindow.document;
+                    if (doc && doc.body) {
+                        const ro = new ResizeObserver(setHeightToContent);
+                        ro.observe(doc.body);
+                    }
+                } catch (e) { }
+
+                updateIframeLinks();
+            });
+
+            player.addEventListener("video:ready", () => {
+                if (
+                    iframe.contentWindow &&
+                    iframe.contentWindow.document.readyState === "complete"
+                ) {
+                    updateIframeLinks();
+                }
+            });
+
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (
+                        mutation.type === "attributes" &&
+                        (mutation.attributeName === "class" ||
+                            mutation.attributeName === "style")
+                    ) {
+                        if (iframe.offsetParent !== null) {
+                            setTimeout(setHeightToContent, 100);
+                        }
+                    }
+                });
+            });
+
+            observer.observe(iframe, {
+                attributes: true,
+            });
+
+            window.addEventListener("resize", setHeightToContent);
+        });
+    </script>
+</body>
+
+</html>
